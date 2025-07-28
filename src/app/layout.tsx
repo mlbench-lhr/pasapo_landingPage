@@ -2,15 +2,16 @@
 import { Poppins } from 'next/font/google'
 import './globals.css'
 import Header from '@/components/Layout/Header'
+import Conditions_header from '@/components/Layout/Conditions_header'
 import Footer from '@/components/Layout/Footer'
 import ScrollToTop from '@/components/ScrollToTop'
 import Aoscompo from '@/utils/aos'
+import { usePathname } from 'next/navigation'
+
 const font = Poppins({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
 })
-import { usePathname } from 'next/navigation'
-
 
 export default function RootLayout({
   children,
@@ -18,16 +19,21 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   const pathname = usePathname()
-  console.log(pathname)
-  const hideLayoutRoutes = ['/tr-tr/mobil_gizlilik_sozlesmesi', '/tr-tr/mobil_mesafeli_satis_sozlesmesi']
-  const shouldHideLayout = hideLayoutRoutes.includes(pathname)
+
+  const conditionRoutes = [
+    '/tr-tr/mobil_gizlilik_sozlesmesi',
+    '/tr-tr/mobil_mesafeli_satis_sozlesmesi',
+  ]
+
+  const isConditionPage = conditionRoutes.includes(pathname)
+
   return (
     <html lang='en' suppressHydrationWarning>
-      <body className={`${font.className}`}>
+      <body className={font.className}>
         <Aoscompo>
-          {!shouldHideLayout && <Header />}
+          {isConditionPage ? <Conditions_header /> : <Header />}
           {children}
-          {!shouldHideLayout && <Footer />}
+          {isConditionPage ? <></> : <Footer />}
         </Aoscompo>
         <ScrollToTop />
       </body>
