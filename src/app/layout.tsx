@@ -19,7 +19,7 @@ export default function RootLayout({
 }>) {
   const pathname = usePathname()
   console.log(pathname)
-  const hideLayoutRoutes = ['/tr-tr/mobil_gizlilik_sozlesmesi']
+  const hideLayoutRoutes = ['/tr-tr/mobil_gizlilik_sozlesmesi', '/tr-tr/mobil_mesafeli_satis_sozlesmesi']
   const shouldHideLayout = hideLayoutRoutes.includes(pathname)
   return (
     <html lang='en' suppressHydrationWarning>

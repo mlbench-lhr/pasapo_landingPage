@@ -1,6 +1,9 @@
 'use client'
 import React from 'react'
 import { useState, useEffect } from 'react'
+import ClipLoader from 'react-spinners/ClipLoader';
+import Swal from "sweetalert2"
+
 
 const ContactForm = () => {
   const [formData, setFormData] = useState({
@@ -34,41 +37,63 @@ const ContactForm = () => {
     formData.email = ''
     formData.phnumber = ''
     formData.Message = ''
+    setIsFormValid(false)
   }
   const handleSubmit = async (e: any) => {
-    e.preventDefault()
-    setLoader(true)
+    e.preventDefault();
+    setLoader(true);
 
-    fetch('https://formsubmit.co/ajax/arshvasani9@gmail.com', {
-      method: 'POST',
-      headers: { 'Content-type': 'application/json' },
-      body: JSON.stringify({
-        Name: formData.firstname,
-        LastName: formData.lastname,
-        Email: formData.email,
-        PhoneNo: formData.phnumber,
-        Message: formData.Message,
-      }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.success) {
-          setSubmitted(true)
-          setShowThanks(true)
-          reset()
+    try {
+      const response = await fetch('/api/email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          Name: formData.firstname,
+          LastName: formData.lastname,
+          Email: formData.email,
+          PhoneNo: formData.phnumber,
+          Message: formData.Message,
+        }),
+      });
 
-          setTimeout(() => {
-            setShowThanks(false)
-          }, 5000)
-        }
+      const data = await response.json();
+      console.log('data:', data);
 
-        reset()
-      })
-      .catch((error) => {
-        setLoader(false)
-        console.log(error.message)
-      })
-  }
+      if (response.status === 200) {
+        setSubmitted(true);
+        setShowThanks(true);
+        reset();
+
+        // Swal.fire({
+        //   icon: 'success',
+        //   title: 'Tebrikler',
+        //   text: 'Mesajınız başarıyla gönderildi.',
+        //   timer: 2000,
+        //   showConfirmButton: false,
+        // });
+
+        setTimeout(() => {
+          setShowThanks(false);
+        }, 5000);
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Hata',
+          text: data.message || 'Mesaj gönderilemedi.',
+        });
+      }
+    } catch (error: any) {
+      console.error('Fetch error:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Bir hata oluştu. Lütfen daha sonra tekrar deneyin.',
+      });
+    } finally {
+      setLoader(false);
+    }
+  };
+
   return (
     <section id='contact'>
       <div className='container'>
@@ -93,6 +118,7 @@ const ContactForm = () => {
                   value={formData.firstname}
                   onChange={handleChange}
                   placeholder='Mehmet'
+                  required
                   className='w-full text-base px-4 rounded-2xl py-2.5 border-solid border transition-all duration-500 focus:border-primary focus:outline-0'
                 />
               </div>
@@ -109,6 +135,7 @@ const ContactForm = () => {
                   value={formData.lastname}
                   onChange={handleChange}
                   placeholder='Yılmaz'
+                  required
                   className='w-full text-base px-4 rounded-2xl py-2.5 border-solid border transition-all duration-500 focus:border-primary focus:outline-0'
                 />
               </div>
@@ -125,6 +152,7 @@ const ContactForm = () => {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder='mehmet@ornek.com'
+                  required
                   className='w-full text-base px-4 rounded-2xl py-2.5 border-solid border transition-all duration-500 focus:border-primary focus:outline-0'
                 />
               </div>
@@ -139,10 +167,14 @@ const ContactForm = () => {
                   type='tel'
                   name='phnumber'
                   placeholder='5xx xxx xx xx'
+                  inputMode='numeric'         // ⬅️ Opens numeric keyboard on mobile
+                  pattern='[0-9]*'            // ⬅️ Suggests numeric-only input
                   value={formData.phnumber}
                   onChange={handleChange}
+                  required
                   className='w-full text-base px-4 rounded-2xl py-2.5 border-solid border transition-all duration-500 focus:border-primary focus:outline-0'
                 />
+
               </div>
             </div>
             <div className='w-full mx-0 my-2.5 flex-1'>
@@ -154,6 +186,7 @@ const ContactForm = () => {
                 name='Message'
                 value={formData.Message}
                 onChange={handleChange}
+                required
                 className='w-full mt-2 rounded-2xl px-5 py-3 border-solid border transition-all duration-500 focus:border-primary focus:outline-0'
                 placeholder='Lütfen mesajınızı buraya yazınız'></textarea>
             </div>
@@ -162,12 +195,15 @@ const ContactForm = () => {
                 type='submit'
                 disabled={!isFormValid || loader}
                 className={`border leading-none px-6 text-lg font-medium py-4 rounded-full 
-                    ${
-                      !isFormValid || loader
-                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                        : 'bg-primary border-primary text-white hover:bg-transparent hover:text-primary cursor-pointer'
-                    }`}>
-                Gönder
+                    ${!isFormValid || loader
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-primary border-primary text-white hover:bg-transparent hover:text-primary cursor-pointer'
+                  }`}>
+                {loader ? (
+                  <ClipLoader size={20} color='#ffffff' />
+                ) : (
+                  'Gönder'
+                )}
               </button>
             </div>
           </form>
