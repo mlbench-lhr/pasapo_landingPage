@@ -3,7 +3,7 @@ import React from 'react'
 function page() {
     return (
         <div className="min-h-screen bg-[#F6F9FC] flex items-center justify-center p-6 mb-5">
-            <div className="bg-white max-w-4xl w-full p-8 rounded-2xl shadow-md ">
+            <div className="bg-white max-w-4xl w-full p-8 rounded-2xl shadow-md mt-16">
                 <div className="flex items-center gap-4 mb-6">
                 </div>
                 <div className="text-gray-600 text-lg space-y-4 ">
